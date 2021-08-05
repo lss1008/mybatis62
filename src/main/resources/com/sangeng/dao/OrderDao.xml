@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.sangeng.dao.OrderDao">
+    <resultMap id="baseOrderMap" type="com.sangeng.pojo.Order" autoMapping="false">
+        <id column="id" property="id"></id>
+        <result column="createtime" property="createtime"/>
+        <result column="price" property="price"/>
+        <result column="remark" property="remark"/>
+    </resultMap>
+    <resultMap id="orderMap" type="com.sangeng.pojo.Order" autoMapping="false" extends="baseOrderMap">
+        <result column="user_id" property="userId"/>
+    </resultMap>
+    <select id="findAll" resultMap="orderMap">
+        select id, createtime, price, remark, user_id
+        from orders
+    </select>
+    <resultMap id="orderUserMap" type="com.sangeng.pojo.Order" autoMapping="false" extends="baseOrderMap">
+        <result column="uid" property="user.id"></result>
+        <result column="username" property="user.username"></result>
+        <result column="age" property="user.age"></result>
+        <result column="address" property="user.address"></result>
+    </resultMap>
+    <resultMap id="orderUserMapUseAssociation" type="com.sangeng.pojo.Order" extends="baseOrderMap">
+        <association property="user" javaType="com.sangeng.pojo.User">
+            <id column="uid" property="id"></id>
+            <result column="username" property="username"></result>
+            <result column="age" property="age"></result>
+            <result column="address" property="address"></result>
+        </association>
+    </resultMap>
+    <select id="findById" resultMap="orderUserMapUseAssociation">
+        select o.id,
+               o.createtime,
+               o.price,
+               o.remark,
+               u.id uid,
+               u.username,
+               u.age,
+               u.address
+        from orders o,
+             user u
+        where o.user_id = u.id
+          and o.id = #{id}
+    </select>
+</mapper>
